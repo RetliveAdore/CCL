@@ -15,16 +15,17 @@ $\qquad$此项目是第一开发者闲暇之余一拍脑袋想出来的点子。
 
 $\qquad$目前支持Window和Linux两大平台。此项目使用纯粹的C和C++混合编写而成，确保你的计算机具有编译C/C++的能力。
 
-**必须具备的运行/编译环境**
-$\qquad$1.C标准库
-$\qquad$2.OpenGL
-$\qquad$3.C/C++编译器（编译）
-$\qquad$4.bash程序（Linux编译）
-$\qquad\qquad$注：我认为所有Linux选手都不可能缺少bash这玩意
-$\qquad$5.cmake程序（Linux编译）
-$\qquad$6.make程序（Linux编译）
+**必须具备的运行/编译环境**  
+$\qquad$ 1.C标准库  
+$\qquad$ 2.OpenGL  
+$\qquad$ 3.C/C++编译器（编译）  
+$\qquad$ 4.bash程序（Linux编译）  
+$\qquad\qquad$ 注：我认为所有Linux选手都不可能缺少bash这玩意  
+$\qquad$ 5.cmake程序（Linux编译）  
+$\qquad$ 6.make程序（Linux编译）
 
 **编译方法：**
+
 $\qquad$Windows上使用Visual Studio进行cmake编译，此IDE对cmake项目的支持很好。
 $\qquad$Linux上确保你有bash执行器，然后进入项目根目录，执行：
 
@@ -46,24 +47,22 @@ $\qquad$假如它提示你缺少 **cmake** 或者 **make** 或者**编译环境*
 
 $\qquad$当前此框架已具有基础的消息框架，渲染框架，有自己的一些好用的数据结构，能够在多平台为你带来稳定一致的体验。
 
-$\qquad$详细的使用文档将在开发小有成就之时放到某个自建网站的网页中（现在还没写）。
-
+$\qquad$详细的使用文档将在开发小有成就之时放到某个自建网站的网页中（现在还没写）。  
 作者在此给予此库的简要使用方法和结构说明以及内含的思想：
 $\qquad$用户在使用时只需要将一个极小的静态库连接到自己的可执行文件中，这个静态库里面包含了此项目的思想精华：加载扩展组件。实际上，加载扩展组件是这个静态库唯一能够做到的事情，所有的有用功能都被打包成动态库文件等待加载。好处是你真的可以随意选择想要的组件，即使是缺失了这些组件程序也不会崩溃，只会什么都不做，并告诉你它找不到组件（笑。
-$\qquad$赞美模块化编程！把各种功能分开来写，打包成各自的模块，这样用户就能自己组装成刚刚好够用的成品了。如果你愿意，可以直接设计自己的模块，只要遵守CCL中十分简洁的模块调用协议，就能立刻将其并入CCL的模块生态（喜），无论自用还是发布出来造福他人都是极好的。
-
+$\qquad$赞美模块化编程！把各种功能分开来写，打包成各自的模块，这样用户就能自己组装成刚刚好够用的成品了。如果你愿意，可以直接设计自己的模块，只要遵守CCL中十分简洁的模块调用协议，就能立刻将其并入CCL的模块生态（喜），无论自用还是发布出来造福他人都是极好的。  
 $\qquad$这里要提醒一下，所有的“官方”的模块都是不提供编译时期的链接方式的，你只能使用CCL核心加载器来加载其中提供的功能。使用如下代码来加载 **CCLstd** 模块并使用其中的 **ShortSleep** 功能：
 
 ~~~C
 //请将CCL核心的头文件加入你的编译环境
-    #include <CCL.h>
+#include <CCL.h>
 
 /*
 * 下面这个头文件其实是一个清单，列出了cclstd加载后
 * 所有可以从里面获取的功能。
 * 这种清单由模块的作者负责编写。
 */
-   #include <cclstd.h>
+#include <cclstd.h>
 
 //这个用来保存加载成功的模块，没错，它就是个ID
 CCLMODID cclstd;
@@ -152,30 +151,30 @@ CCLMODAPI void CCLEXexit()
 ## 结构
 
 此项目的目录结构为（可以看出有很多东西还没开始写）：
-CCL
-└─parts
-$\qquad$├─cclaudio
-$\qquad$├─cclcore
-$\qquad$│$\qquad$├─include
-$\qquad$│$\qquad$└─src
-$\qquad$├─cclgraphic
-$\qquad$│$\qquad$├─include
-$\qquad$│$\qquad$└─src
-$\qquad$├─cclinet
-$\qquad$│$\qquad$├─include
-$\qquad$│$\qquad$└─src
-$\qquad$├─cclstd
-$\qquad$│$\qquad$├─include
-$\qquad$│$\qquad$└─src
-$\qquad$└─demos
-$\qquad\qquad$├─include
-$\qquad\qquad$│$\qquad$├─demo1
-$\qquad\qquad$│$\qquad$└─demo2
-$\qquad\qquad$└─src
-$\qquad\qquad\qquad$├─demo1
+CCL  
+└─parts  
+$\qquad$├─cclaudio  
+$\qquad$├─cclcore  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
+$\qquad$├─cclgraphic  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
+$\qquad$├─cclinet  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
+$\qquad$├─cclstd  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
+$\qquad$└─demos  
+$\qquad\qquad$├─include  
+$\qquad\qquad$│$\qquad$├─demo1  
+$\qquad\qquad$│$\qquad$└─demo2  
+$\qquad\qquad$└─src  
+$\qquad\qquad\qquad$├─demo1  
 $\qquad\qquad\qquad$└─demo2
 
-## 一些牢骚
+## 一些牢骚（倒叙）
 
 "Cubic Crystal Library"
 “立方晶”
@@ -195,37 +194,20 @@ CCL的很多功能和服务是在GCL中实验过很多遍之后搬过来的，�
 //
 -2023-5-16-Adore
 
-**v0.0.3.3-alpha** 版本号继承自GCL的末期版本
-CCL的组织方式发生了变化，所有的可选功能全部放到外部模块里面，需要用户自己选择加载。
-核心部分尽可能的小（只要确保有完全加载模块的能力即可），作者并不喜欢一个“大而丑”的东西。
-///////////
-这种方法有一些好处，封装好的文件可以立刻通用（C的符号格式），无需再次编译链接，热加载，
-缺失非关程序键模块时不会自动崩溃，在用户愿意的情况下可以继续运行。
--2023-6-21-Adore
+**0.0.5.3-alpha** Windows改姓mesa了（雾
+Windows中D2D和D3D是真的活少事多，很难和OpenGL统一起来，所以说干脆直接改用OpenGL。
+毕竟之前是有在Linux铺过路的，所以说这次直接改一点点接口就能上阵，状态很完美。
+DirectX在现在处于弃用的状态。
+-2023-9-4-Adore
 
-**v0.0.4.0-alpha** 添加多线程支持
-实际上是将GCL内化的std部分搬到外部模块里面去了。
--2023-6-22-Adore
+**v0.0.5.2-alpha** Linux图形框架构建出来了
+这下轮到Windows重写了，direct2D和OpenGL的坐标系很难统一，而且OpenGL到3D可以一步到位，所以说现在还是决定
+在Windows平台使用OpenGL。当然窗口管理系统还是使用已经构建起来的Win32框架。
+-2023-9-3-Adore
 
-**v0.0.4.1-alpha** Linux也支持了
-并没有更改任何功能结构，只是拓展了平台支持，实际上到这一步才算勉强达到GCL的水准了。
-要记住Autobuild.sh绝对不能使用带标志UTF8（UTF8 with BOM），否则上面的标志行会导致脚本无法执行。
--2023-6-22-Adore
-
-**v0.0.4.2-alpha** 基本视窗框架完成了（仅限Windows）
-摸鱼了很长时间，现在完成窗口管理的主要结构，还没有添加任何功能，暂时不能实用。
-此结构是为后面的图像绘制打基础的，被一并包含在graphic组件里面。
--2023-8-2-Adore
-
-**v0.0.4.3-alpha** 2D图形实体管理架构完成（仅限Windows）
-中间遇到了各种莫名其妙的问题，吐血ing。。。
-数据结构加入了遍历功能，其中二叉树默认为中序遍历，线性表从前往后依次遍历。
--2023-8-4-Adore
-
-**v0.0.4.4-alpha** 完善功能（仅限Windows）
-增加了更多2D实体的支持，在core中增加了一些便捷封装。
-下一次版本号变动就是较大变动，STEP变动到5，但仍然是alpha，目前有骨缺肉。
--2023-8-4-Adore
+**v0.0.5.1-alpha** 窗口管理部分创建（Linux）
+Xlib自带的绘图不是很好用，在Linux上的2D以及3D图像渲染模块计划使用OpenGL一步到位了。
+-2023-8-31-Adore
 
 **v0.0.5.0-alpha** 基础gui管理部分基本完善（仅限Windows）
 增加了更多2D实体的支持，修正了屎山中一些多线程问题，现在运行更加稳定了。
@@ -234,17 +216,34 @@ CCL的组织方式发生了变化，所有的可选功能全部放到外部模�
 持以及Linux方面的基础功能。
 -2023-8-9-Adore
 
-**v0.0.5.1-alpha** 窗口管理部分创建（Linux）
-Xlib自带的绘图不是很好用，在Linux上的2D以及3D图像渲染模块计划使用OpenGL一步到位了。
--2023-8-31-Adore
+**v0.0.4.4-alpha** 完善功能（仅限Windows）
+增加了更多2D实体的支持，在core中增加了一些便捷封装。
+下一次版本号变动就是较大变动，STEP变动到5，但仍然是alpha，目前有骨缺肉。
+-2023-8-4-Adore
 
-**v0.0.5.2-alpha** Linux图形框架构建出来了
-这下轮到Windows重写了，direct2D和OpenGL的坐标系很难统一，而且OpenGL到3D可以一步到位，所以说现在还是决定
-在Windows平台使用OpenGL。当然窗口管理系统还是使用已经构建起来的Win32框架。
--2023-9-3-Adore
+**v0.0.4.3-alpha** 2D图形实体管理架构完成（仅限Windows）
+中间遇到了各种莫名其妙的问题，吐血ing。。。
+数据结构加入了遍历功能，其中二叉树默认为中序遍历，线性表从前往后依次遍历。
+-2023-8-4-Adore
 
-**0.0.5.3-alpha** Windows改姓mesa了（雾
-Windows中D2D和D3D是真的活少事多，很难和OpenGL统一起来，所以说干脆直接改用OpenGL。
-毕竟之前是有在Linux铺过路的，所以说这次直接改一点点接口就能上阵，状态很完美。
-DirectX在现在处于弃用的状态。
--2023-9-4-Adore
+**v0.0.4.2-alpha** 基本视窗框架完成了（仅限Windows）
+摸鱼了很长时间，现在完成窗口管理的主要结构，还没有添加任何功能，暂时不能实用。
+此结构是为后面的图像绘制打基础的，被一并包含在graphic组件里面。
+-2023-8-2-Adore
+
+**v0.0.4.1-alpha** Linux也支持了
+并没有更改任何功能结构，只是拓展了平台支持，实际上到这一步才算勉强达到GCL的水准了。
+要记住Autobuild.sh绝对不能使用带标志UTF8（UTF8 with BOM），否则上面的标志行会导致脚本无法执行。
+-2023-6-22-Adore
+
+**v0.0.4.0-alpha** 添加多线程支持
+实际上是将GCL内化的std部分搬到外部模块里面去了。
+-2023-6-22-Adore
+
+**v0.0.3.3-alpha** 版本号继承自GCL的末期版本
+CCL的组织方式发生了变化，所有的可选功能全部放到外部模块里面，需要用户自己选择加载。
+核心部分尽可能的小（只要确保有完全加载模块的能力即可），作者并不喜欢一个“大而丑”的东西。
+///////////
+这种方法有一些好处，封装好的文件可以立刻通用（C的符号格式），无需再次编译链接，热加载，
+缺失非关程序键模块时不会自动崩溃，在用户愿意的情况下可以继续运行。
+-2023-6-21-Adore
