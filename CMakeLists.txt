@@ -17,5 +17,6 @@ endif()
 
 add_subdirectory("./parts/cclcore")
 add_subdirectory("./parts/cclstd")
+add_subdirectory("./parts/cclcompressor")
 add_subdirectory("./parts/cclgraphic")
 add_subdirectory("./parts/demos")

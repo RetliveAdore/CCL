@@ -1,21 +1,27 @@
 ﻿#include "inner.h"
+#include <assert.h>
+
+//限制动态数组最大容量为512MB
+#define CCL_DYN_MAXSIZE (1024 * 1024 * 512 / sizeof(void*))
 
 static const char* ErrPool[] = {
 	"Fine\0",
 	"Invalid structure\0",
 	"NULL ptr\0",
-	"Not fond\0"
+	"Not fond\0",
+	"Run out of memory\n"
 };
 #define NO_ERR 0
 #define WRONG_STRUCTURE 1
 #define NULLPTR_ERR 2
 #define NOTFOND_ERR 3
+#define OUTOF_MEMORY 4
 static const char* CurrentErr = NULL;
 
 CCLAPI CCLDataStructure CCLCreateLinearTable()
 {
-	PCCLLinearTable pInner = NULL;
-	while (!pInner) pInner = malloc(sizeof(CCLLinearTable));
+	PCCLLinearTable pInner = malloc(sizeof(CCLLinearTable));
+	assert(pInner);
 	pInner->head.total = 0;
 	pInner->head.type = CCLDATASTRUCTURE_TYPE_LINEAR;
 	pInner->hook = NULL;
@@ -24,11 +30,23 @@ CCLAPI CCLDataStructure CCLCreateLinearTable()
 
 CCLAPI CCLDataStructure CCLCreateTreeMap()
 {
-	PCCLTreeMap pInner = NULL;
-	while (!pInner) pInner = malloc(sizeof(CCLTreeMap));
+	PCCLTreeMap pInner = malloc(sizeof(CCLTreeMap));
+	assert(pInner);
 	pInner->head.total = 0;
 	pInner->head.type = CCLDATASTRUCTURE_TYPE_TREE;
 	pInner->root = NULL;
+	return pInner;
+}
+
+CCLAPI CCLDataStructure CCLCreateDynamicArray()
+{
+	PCCLDynamicArray pInner = malloc(sizeof(CCLDynamicArray));
+	assert(pInner);
+	pInner->head.total = 0;
+	pInner->head.type = CCLDATASTRUCTURE_TYPE_DYN;
+	pInner->arr = malloc(1);
+	assert(pInner->arr);
+	pInner->capacity = 1;
 	return pInner;
 }
 
@@ -418,6 +436,25 @@ void destroy_tree(PCCLTreeMap tree, CCLClearCallback callback)
 		clear_node(tree->root, callback);
 }
 
+void destroy_dyn(PCCLDynamicArray dyn, CCLClearCallback callback)
+{
+	if (!dyn->arr)
+		return;
+	if (!callback)
+	{
+		free(dyn->arr);
+	}
+	else
+	{
+		while (dyn->head.total)
+		{
+			dyn->head.total--;
+			callback(&(dyn->arr[dyn->head.total]));
+		}
+		free(dyn->arr);
+	}
+}
+
 CCLAPI CCLBOOL CCLDestroyDataStructure(PCCLDataStructure pStructure, CCLClearCallback callback)
 {
 	if (!pStructure || !*pStructure)
@@ -433,10 +470,15 @@ CCLAPI CCLBOOL CCLDestroyDataStructure(PCCLDataStructure pStructure, CCLClearCal
 	case CCLDATASTRUCTURE_TYPE_TREE:
 		destroy_tree(*pStructure, callback);
 		break;
+	case CCLDATASTRUCTURE_TYPE_DYN:
+		destroy_dyn(*pStructure, callback);
+		break;
 	default:
 		CurrentErr = ErrPool[WRONG_STRUCTURE];
 		goto Failed;
 	}
+	free(*pStructure);
+	*pStructure = NULL;
 	return CCLTRUE;
 Failed:
 	return CCLFALSE;
@@ -469,6 +511,16 @@ void enum_tree(CCLTreeMap* tree, CCLEnumCallback callback, void* user)
 		enum_node(tree->root, callback, user);
 }
 
+void enum_dyn(CCLDynamicArray* dyn, CCLEnumCallback callback, void* user)
+{
+	if (!dyn->arr)
+		return;
+	for (int i = 0; i < dyn->head.total; i++)
+	{
+		callback(&(dyn->arr[i]), user, i);
+	}
+}
+
 CCLAPI CCLBOOL CCLDataStructureEnum(CCLDataStructure structure, CCLEnumCallback callback, void* user)
 {
 	if (!structure)
@@ -486,6 +538,9 @@ CCLAPI CCLBOOL CCLDataStructureEnum(CCLDataStructure structure, CCLEnumCallback 
 		break;
 	case CCLDATASTRUCTURE_TYPE_TREE:
 		enum_tree(structure, callback, user);
+		break;
+	case CCLDATASTRUCTURE_TYPE_DYN:
+		enum_dyn(structure, callback, user);
 		break;
 	default:
 		break;
@@ -1004,5 +1059,178 @@ FindOver:
 Failed:
 	return NULL;
 }
-//居然都没超过1000行（划掉）
+//---居然都没超过1000行---（划掉）
 //坏了啦！现在超过1000行了
+
+//====================--------------------
+
+CCLUINT8* dyn_arr_sizeup(CCLUINT8* arr, CCLUINT64 size, CCLUINT64 capacity)
+{
+	CCLUINT8* tmp = calloc(capacity, 1);
+	if (!tmp)
+	{
+		CurrentErr = ErrPool[OUTOF_MEMORY];
+		return NULL;
+	}
+	memcpy(tmp, arr, size);
+	free(arr);
+	return tmp;
+}
+
+CCLAPI CCLBOOL CCLDynamicArrayPush(CCLDataStructure dyn, CCLUINT8 data)
+{
+	PCCLDynamicArray pInner = dyn;
+	if (!pInner)
+	{
+		CurrentErr = ErrPool[NULLPTR_ERR];
+		goto Failed;
+	}
+
+	if (pInner->head.total < pInner->capacity)
+	{
+		pInner->arr[pInner->head.total++] = data;
+		return CCLTRUE;
+	}
+	//需要扩容
+	if (pInner->capacity >= CCL_DYN_MAXSIZE)
+	{
+		CurrentErr = ErrPool[OUTOF_MEMORY];
+		goto Failed;
+	}
+	//确定扩容后大小，不得超过容量限制
+	if (pInner->capacity << 1 < CCL_DYN_MAXSIZE)
+		pInner->capacity <<= 1;
+	else
+		pInner->capacity = CCL_DYN_MAXSIZE;
+
+	CCLUINT8* tmp = dyn_arr_sizeup(pInner->arr, pInner->head.total, pInner->capacity);
+	if (tmp)
+		pInner->arr = tmp;
+	else goto Failed;
+
+	pInner->arr[pInner->head.total++] = data;
+	return CCLTRUE;
+Failed:
+	return CCLFALSE;
+}
+
+CCLAPI CCLBOOL CCLDynamicArraySet(CCLDataStructure dyn, CCLUINT8 data, CCLUINT64 subscript)
+{
+	PCCLDynamicArray pInner = dyn;
+	if (!pInner)
+	{
+		CurrentErr = ErrPool[NULLPTR_ERR];
+		goto Failed;
+	}
+
+	if (subscript >= 0 && subscript < pInner->head.total)
+		pInner->arr[subscript] = data;
+	else if (subscript == pInner->head.total)
+		pInner->arr[pInner->head.total++] = data;
+	else if (subscript > pInner->head.total && subscript < pInner->capacity)
+	{
+		pInner->arr[subscript++] = data;
+		pInner->head.total = subscript;
+	}
+	else if (subscript < CCL_DYN_MAXSIZE)
+	{
+		while (pInner->capacity <= subscript)
+		{
+			pInner->capacity <<= 1;
+		}
+		CCLUINT8* tmp = dyn_arr_sizeup(pInner->arr, pInner->head.total, pInner->capacity);
+		if (tmp)
+			pInner->arr = tmp;
+		else goto Failed;
+		pInner->arr[subscript++] = data;
+		pInner->head.total = subscript;
+	}
+	else
+	{
+		CurrentErr = ErrPool[OUTOF_MEMORY];
+		goto Failed;
+	}
+
+	return CCLTRUE;
+Failed:
+	return CCLFALSE;
+}
+
+CCLUINT8* dyn_arr_sizedown(CCLUINT8* arr, CCLUINT64 capacity)
+{
+	CCLUINT8* tmp = calloc(capacity, 1);
+	if (!tmp)
+	{
+		CurrentErr = ErrPool[OUTOF_MEMORY];
+		return NULL;
+	}
+	memcpy(tmp, arr, capacity);
+	free(arr);
+	return tmp;
+}
+
+CCLAPI CCLUINT8 CCLDynamicArrayPop(CCLDataStructure dyn)
+{
+	PCCLDynamicArray pInner = dyn;
+	if (!pInner)
+	{
+		CurrentErr = ErrPool[NULLPTR_ERR];
+		goto Failed;
+	}
+
+	if (pInner->head.total <= 0 || pInner->head.total > CCL_DYN_MAXSIZE)
+	{
+		CurrentErr = ErrPool[NOTFOND_ERR];
+		goto Failed;
+	}
+	
+	CCLUINT8 ret_val = pInner->arr[(pInner->head.total--) - 1];
+
+	if (pInner->head.total >= pInner->capacity >> 1 || pInner->capacity <= 32)
+		return ret_val;
+
+	//可以释放一些闲置空间
+	pInner->capacity >>= 1;
+	CCLUINT8* tmp = dyn_arr_sizedown(pInner->arr, pInner->capacity);
+	if (tmp)
+		pInner->arr = tmp;
+	else goto Failed;
+
+	return ret_val;
+Failed:
+	return 0;
+}
+
+CCLAPI CCLUINT8 CCLDynamicArraySeek(CCLDataStructure dyn, CCLUINT64 subscript)
+{
+	PCCLDynamicArray pInner = dyn;
+	if (!pInner)
+	{
+		CurrentErr = ErrPool[NULLPTR_ERR];
+		return 0;
+	}
+
+	if (subscript >= 0 && subscript < pInner->head.total)
+		return pInner->arr[subscript];
+
+	CurrentErr = ErrPool[NOTFOND_ERR];
+	return 0;
+}
+
+CCLAPI CCLUINT64 CCLDynamicArrayCopy(CCLDataStructure dyn, CCLUINT8** pOut)
+{
+	PCCLDynamicArray pInner = dyn;
+	if (!pInner)
+	{
+		CurrentErr = ErrPool[NULLPTR_ERR];
+		return 0;
+	}
+
+	*pOut = NULL;
+	if (!pInner->head.total)
+		return 0;
+
+	*pOut = malloc(pInner->head.total);
+	memcpy(*pOut, pInner->arr, pInner->head.total);
+	return pInner->head.total;
+}

@@ -207,6 +207,9 @@ CCLAPI void CCLVersion(CCLVERSION* pversion);
 
 CCLAPI CCLDataStructure CCLCreateLinearTable();
 CCLAPI CCLDataStructure CCLCreateTreeMap();
+CCLAPI CCLDataStructure CCLCreateDynamicArray();
+//循环数组，固定大小顺序一圈站，后来的会把先到的挤出去
+CCLAPI CCLDataStructure CCLCreateLoopArray(CCLUINT32 size);
 
 CCLAPI CCLBOOL CCLDestroyDataStructure(PCCLDataStructure pStructure, CCLClearCallback callback);
 CCLAPI CCLUINT64 CCLDataStructureSize(CCLDataStructure structure);
@@ -225,7 +228,23 @@ CCLAPI CCLBOOL CCLTreeMapPut(CCLDataStructure tree, void* data, CCLINT64 id);
 CCLAPI void* CCLTreeMapGet(CCLDataStructure tree, CCLINT64 id);
 CCLAPI void* CCLTreeMapSeek(CCLDataStructure tree, CCLINT64 id);
 
-//线性表从前往后顺序遍历，树中序遍历
+/*
+* 动态数组的最大容量其实是有限制的，为了防止某些脑瘫一上来就把物理内存耗尽。
+* 如果达到上限，或者分配内存失败，你将获得错误提示：空间不足，且维持原空间不变
+*
+* 动态数组不仅能主动扩增空间，也能主动缩减空间，以增加空间使用效率
+*/
+
+//用于在动态数组末尾插入数据
+CCLAPI CCLBOOL CCLDynamicArrayPush(CCLDataStructure dyn, CCLUINT8 data);
+//用于弹出动态数组末尾的数据（成功后数组有效长度减一）
+CCLAPI CCLUINT8 CCLDynamicArrayPop(CCLDataStructure dyn);
+//用于设置数组内某一下标的值（超过有效长度将扩展容量）
+CCLAPI CCLBOOL CCLDynamicArraySet(CCLDataStructure dyn, CCLUINT8 data, CCLUINT64 subscript);
+CCLAPI CCLUINT8 CCLDynamicArraySeek(CCLDataStructure dyn, CCLUINT64 subscript);
+CCLAPI CCLUINT64 CCLDynamicArrayCopy(CCLDataStructure dyn, CCLUINT8** pOut);
+
+//线性表从前往后顺序遍历，树中序遍历, 动态数组从前往后
 CCLAPI CCLBOOL CCLDataStructureEnum(CCLDataStructure structure, CCLEnumCallback callback, void* user);
 
 //收尾（垃圾处理）
@@ -263,5 +282,13 @@ CCLAPI const char* CCLCurrentErr_EXModule();
 #ifdef __cplusplus
 }
 #endif
+
+#define CCLforEach(structure, callback, user) CCLDataStructureEnum(structure, callback, user)
+
+//位操作需要的遮罩 1000_0000
+#define CCL_BIT_MASK_1  (CCLUINT16)0x80
+//位操作需要的遮罩 0111_1111
+#define CCL_BIT_MASK_0  (CCLUINT16)0x7f
+#define CCL_BIT_COVER   (CCLUINT16)0xff
 
 #endif //include

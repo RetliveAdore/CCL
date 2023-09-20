@@ -10,6 +10,7 @@
 
 #define CCLDATASTRUCTURE_TYPE_LINEAR 0x01
 #define CCLDATASTRUCTURE_TYPE_TREE   0x02
+#define CCLDATASTRUCTURE_TYPE_DYN    0x03
 
 typedef struct
 {
@@ -55,6 +56,18 @@ typedef struct
 	CCLDataStructurePublic head;
 	PCCLTreeMapNode root;
 } CCLTreeMap, * PCCLTreeMap;
+
+/*
+* dynamic array bellow
+* 动态数组
+*/
+
+typedef struct
+{
+	CCLDataStructurePublic head;
+	CCLUINT8* arr;
+	CCLUINT64 capacity;
+} CCLDynamicArray, * PCCLDynamicArray;
 
 //----------------------------------------
 

@@ -6,6 +6,7 @@ include_directories("./include")
 include_directories("../cclcore/include")
 include_directories("../cclstd/include")
 include_directories("../cclgraphic/include")
+include_directories("../cclcompressor/include")
 
 file(GLOB_RECURSE Demo_1
   "./src/demo1/*.c"
@@ -21,15 +22,25 @@ file(GLOB_RECURSE Demo_2
   "./include/demo2/*.hpp"
 )
 
+file(GLOB_RECURSE Demo_3
+  "./src/demo3/*.c"
+  "./src/demo3/*.cpp"
+  "./include/demo3/*.h"
+  "./include/demo3/*.hpp"
+)
+
 link_libraries("CCL")
 
 add_executable("demo1" ${Demo_1})
 add_executable("demo2" ${Demo_2})
+add_executable("demo3" ${Demo_3})
 
 if(MSVC)
   set_property(TARGET "demo1" PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
   set_property(TARGET "demo2" PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  set_property(TARGET "demo3" PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
 add_dependencies(demo1 CCL_std)
 add_dependencies(demo2 CCL_std CCL_graphic)
+add_dependencies(demo3 CCL_std CCL_Compressor)
