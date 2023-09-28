@@ -60,4 +60,5 @@ Failed:
 
 CCLMODAPI void CCLEXexit()
 {
+	_inner_cclgraphic_clear();
 }

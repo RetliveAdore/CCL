@@ -16,10 +16,11 @@ $\qquad$此项目是第一开发者闲暇之余一拍脑袋想出来的点子。
 $\qquad$目前支持Window和Linux两大平台。此项目使用纯粹的C和C++混合编写而成，确保你的计算机具有编译C/C++的能力。
 
 **必须具备的运行/编译环境**  
-$\qquad$ 1.C标准库  
-$\qquad$ 2.OpenGL  
+$\qquad$ 0.C标准库  
+$\qquad$ 1.OpenGL  
+$\qquad$ 2.Xlib（Linux）  
+$\qquad$ 3.Visual studio集成环境（Windows编译）  
 $\qquad$ 4.C/C++编译器（编译）  
-$\qquad$ 3.Xlib（Linux）  
 $\qquad$ 5.bash程序（Linux编译）  
 $\qquad\qquad$ 注：我认为所有Linux选手都不可能缺少bash这玩意  
 $\qquad$ 6.cmake程序（编译）  
@@ -127,7 +128,7 @@ End:
 }
 ~~~
 
-$\qquad$上述示例阐明了CCL核心加载器的工作流程，下面简要阐述CCL模块的一些特征：
+$\qquad$上述示例阐明了CCL核心加载器的工作流程，下面简要阐述CCL模块的一些特征：  
 $\qquad$首先模块都将被打包成完完全全的动态库，在CMakeLists.txt里面是这样描述的：
 
 ~~~cmake
@@ -156,25 +157,25 @@ CCL
 └─parts  
 $\qquad$├─cclaudio  
 $\qquad$├─cclcore  
-$\qquad$│   ├─include  
-$\qquad$│   └─src  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
 $\qquad$├─cclcompressor  
-$\qquad$│   ├─include  
-$\qquad$│   └─src  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
 $\qquad$├─cclgraphic  
-$\qquad$│   ├─include  
-$\qquad$│   └─src  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
 $\qquad$├─cclinet  
-$\qquad$│   ├─include  
-$\qquad$│   └─src  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
 $\qquad$├─cclstd  
-$\qquad$│   ├─include  
-$\qquad$│   └─src  
+$\qquad$│$\qquad$├─include  
+$\qquad$│$\qquad$└─src  
 $\qquad$└─demos  
 $\qquad\qquad$├─include  
-$\qquad\qquad$│ ├─demo1  
-$\qquad\qquad$│ ├─demo2  
-$\qquad\qquad$│ └─demo3  
+$\qquad\qquad$│$\qquad$├─demo1  
+$\qquad\qquad$│$\qquad$├─demo2  
+$\qquad\qquad$│$\qquad$└─demo3  
 $\qquad\qquad$└─src  
 $\qquad\qquad\qquad$├─demo1  
 $\qquad\qquad\qquad$├─demo2  
@@ -200,8 +201,14 @@ CCL的很多功能和服务是在GCL中实验过很多遍之后搬过来的，�
 //  
 -2023-5-16-Adore
 
+**0.0.6.1-alpha** 加入TCP网络模块（socket）  
+网络编程是很复杂的类别，甚至复杂度超过了多线程（因为网络任何时都有可能受到干扰，不如本地环境一般稳定）  
+。这种异步不是靠时延就能解决的，必须想尽办法用机制来确保稳定。  
+从今天开始，CCL就不再是一个简单的模块群了，它将逐渐具有高级实用价值。
+-2023-9-28-Adore
+
 **0.0.6.0-alpha** LZ77算法和动态数组  
-动态数组最大简单，但压缩算法真的很变态。。。并不是原理男，而是实现难（工程师的真实瞬间），亚字节操作  
+动态数组最大简单，但压缩算法真的很变态。。。并不是原理难，而是实现难（工程师的真实瞬间），亚字节操作  
 让检查内容十分艰难，只有把压缩和解压全部完成之后才能比较直观地debug，不过历经千辛万苦还是成了  
 -2023-9-20-Adore
 

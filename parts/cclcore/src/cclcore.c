@@ -7,7 +7,7 @@ CCLAPI void CCLVersion(CCLVERSION* pversion)
 		pversion->MAJOR = 0;
 		pversion->MINOR = 0;
 		pversion->STEP  = 6;
-		pversion->CHECK = 0;
+		pversion->CHECK = 1;
 		pversion->VER   = CCLVERSION_ALPHA;
 	}
 }

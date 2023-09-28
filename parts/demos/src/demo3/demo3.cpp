@@ -34,6 +34,8 @@ int main(int argc, char** argv)
 		std::cout << CCLCurrentErr_EXModule() << std::endl;
 		return 1;
 	}
+	delete path;
+
 	CCL_MOD_REQUEST_STRUCTURE req;
 	CCLModGetFn(compressor, CCLSERV_INFENTROPY, &req);
 	if (req.func)
