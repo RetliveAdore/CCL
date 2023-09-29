@@ -1,11 +1,13 @@
 ﻿#include <CCL.h>
 #include <cclinet.h>
 #include <iostream>
+#include <string.h>
 
 CCLMODID cclstd, cclinet;
-CCLModFunction inetclient, streaminet;
+CCLModFunction inetclient, streaminet, shortsleep;
 
 CCLUINT8 buffer[] = "123321";
+CCLUINT8 ip[] = "127.0.0.1";
 
 int main(int argc, char** argv)
 {
@@ -37,6 +39,10 @@ int main(int argc, char** argv)
 	}
 
 	CCL_MOD_REQUEST_STRUCTURE req;
+	CCLModGetFn(cclstd, CCLSERV_SHORT_SLEEP, &req);
+	if (req.func)
+		shortsleep = req.func;
+	else return 1;
 	CCLModGetFn(cclinet, CCLSERV_INET_CLIENT, &req);
 	if (req.func)
 		inetclient = req.func;
@@ -47,7 +53,7 @@ int main(int argc, char** argv)
 	else return 1;
 
 	CCL_CLIENT_REQ client_req;
-	client_req.addr = "127.0.0.1";
+	client_req.addr = (char*)ip;
 	client_req.port = 2567;
 	client_req.timeout = 5;
 	inetclient(&client_req);
@@ -67,8 +73,7 @@ int main(int argc, char** argv)
 		std::cout << stream.error << std::endl;
 	else
 		std::cout << "buffer: " << buffer << std::endl;
-	_sleep(1000);
-	stream.buffer = buffer;
+	shortsleep((void*)1000);
 	stream.buffersize = strlen((char*)buffer);
 	streaminet(&stream);
 	if (stream.error)

@@ -1,9 +1,10 @@
 ﻿#include <CCL.h>
 #include <cclinet.h>
 #include <iostream>
+#include <string.h>
 
 CCLMODID cclstd, cclinet;
-CCLModFunction inetserver, streaminet, closesoc, ifclean;
+CCLModFunction inetserver, streaminet, closesoc, ifclean, shortsleep;
 
 CCLBOOL run = CCLTRUE;
 
@@ -29,7 +30,7 @@ void process(CCL_SOCKET soc)
 	stream.soc = soc;
 	while (run)
 	{
-		stream.buffersize = 10;
+		stream.buffersize = 9;
 		streaminet(&stream);
 		if (stream.error)
 		{
@@ -37,8 +38,12 @@ void process(CCL_SOCKET soc)
 			break;
 		}
 		if (!stream.effective) break;
-		else if (stream.buffersize < 0) _sleep(1);
-		else printf("%s\n", ch);
+		else if (stream.buffersize < 0) shortsleep((void*)1);
+		else
+		{
+			ch[stream.buffersize] = '\0';
+			printf("%s\n", ch);
+		}
 	}
 	printf("disconnect\n");
 }
@@ -73,6 +78,10 @@ int main(int argc, char** argv)
 	}
 
 	CCL_MOD_REQUEST_STRUCTURE req;
+	CCLModGetFn(cclstd, CCLSERV_SHORT_SLEEP, &req);
+	if (req.func)
+		shortsleep = req.func;
+	else return 1;
 	CCLModGetFn(cclinet, CCLSERV_INET_SERVER, &req);
 	if (req.func)
 		inetserver = req.func;
@@ -124,7 +133,7 @@ int main(int argc, char** argv)
 	while (!clean)
 	{
 		ifclean(&clean);
-		_sleep(10);
+		shortsleep((void*)10);
 	}
 
 	return 0;

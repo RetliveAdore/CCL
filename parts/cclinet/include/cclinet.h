@@ -7,7 +7,7 @@
 #define CCLINET_MODNAME "CCLinet"
 
 //socket也是内部托管的，用户拿到的是对应的ID
-typedef CCLUINT32 CCL_SOCKET;
+typedef CCLUINT64 CCL_SOCKET;
 
 typedef void (*CCLInetProcess)(CCL_SOCKET soc);
 

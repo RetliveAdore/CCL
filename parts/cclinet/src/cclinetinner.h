@@ -4,6 +4,7 @@
 #include <cclinet.h>
 #include <stdio.h>
 #include <cclstd.h>
+#include <malloc.h>
 
 #define CCL_TYPE_SERVER 1
 #define CCL_TYPE_CLIENT 2
